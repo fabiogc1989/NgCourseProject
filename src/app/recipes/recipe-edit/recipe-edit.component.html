@@ -20,13 +20,13 @@
                     <div class="form-group">
                         <label for="imagePath">Image URL</label>
                         <input type="text" formControlName="imagePath" name="imagePath" id="imagePath"
-                            class="form-control">
+                            class="form-control" #localImgPath>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <img src="" class="img-responsive">
+                    <img [src]="localImgPath.value" class="img-responsive">
                 </div>
             </div>
             <div class="row">
