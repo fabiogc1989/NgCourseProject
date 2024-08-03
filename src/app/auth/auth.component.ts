@@ -34,10 +34,10 @@ export class AuthComponent {
             .subscribe(authData => {
                 console.log(authData);
                 this.isLoading = false;
-            }, error => {
-                console.log(error);
+            }, errorMessage => {
+                console.log(errorMessage);
                 this.isLoading = false;
-                this.error = 'An error occurred!'
+                this.error = errorMessage;
             });
         }
         
