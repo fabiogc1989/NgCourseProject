@@ -14,40 +14,40 @@ export interface AuthResponseData {
     registered?: boolean;
 }
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
     user = new BehaviorSubject<User>(null);
 
-    constructor(private http: HttpClient, private router: Router){}
+    constructor(private http: HttpClient, private router: Router) { }
 
-    signin(email: string, password: string){
+    signin(email: string, password: string) {
         return this.http
             .post<AuthResponseData>(
-            'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBIo5jZd-P5VK9oonl2ZxmjfupVzNKH9JE ',
-            {
-                email,
-                password,
-                returnSecureToken: true
-            })
+                'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBIo5jZd-P5VK9oonl2ZxmjfupVzNKH9JE ',
+                {
+                    email,
+                    password,
+                    returnSecureToken: true
+                })
             .pipe(
-                catchError(this.handleError), 
+                catchError(this.handleError),
                 tap(resData => {
                     this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
                 })
             );
     }
 
-    signup(email: string, password: string){
+    signup(email: string, password: string) {
         return this.http
             .post<AuthResponseData>(
-            'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBIo5jZd-P5VK9oonl2ZxmjfupVzNKH9JE ',
-            {
-                email,
-                password,
-                returnSecureToken: true
-            })
+                'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBIo5jZd-P5VK9oonl2ZxmjfupVzNKH9JE ',
+                {
+                    email,
+                    password,
+                    returnSecureToken: true
+                })
             .pipe(
-                catchError(this.handleError), 
+                catchError(this.handleError),
                 tap(resData => {
                     this.handleAuthentication(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
                 })
@@ -56,22 +56,23 @@ export class AuthService {
 
     autoLogin() {
         const userData: {
-            email: string; 
-            id: string; 
-            _token: string; 
+            email: string;
+            id: string;
+            _token: string;
             _tokenExpirationDate: string;
         } = JSON.parse(localStorage.getItem('userData'));
-        if(!userData){
+        if (!userData) {
             return;
         }
         const loadedUser = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate));
 
-        if(loadedUser.token) {
+        if (loadedUser.token) {
             this.user.next(loadedUser);
         }
     }
 
     logout() {
+        localStorage.removeItem('userData');
         this.user.next(null);
         this.router.navigate(['/auth']);
     }
@@ -83,12 +84,12 @@ export class AuthService {
         localStorage.setItem('userData', JSON.stringify(user));
     }
 
-    private handleError(errorRes: HttpErrorResponse){
+    private handleError(errorRes: HttpErrorResponse) {
         let errorMessage = 'Unknown error occurred!';
         if (!errorRes.error || !errorRes.error.error) {
             return throwError(errorMessage);
         }
-        switch(errorRes.error.error.message){
+        switch (errorRes.error.error.message) {
             case 'EMAIL_EXISTS':
                 errorMessage = 'This email already exists'
                 break;
