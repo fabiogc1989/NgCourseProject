@@ -1,9 +1,11 @@
-import { Component } from "@angular/core";
+import { Component, ComponentFactoryResolver, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { Observable, Subscription } from "rxjs";
 import { Router } from "@angular/router";
 
 import { AuthResponseData, AuthService } from "./auth.service";
+import { AlertComponent } from "../shared/alert/alert.component";
+import { PlaceholderDirective } from "../shared/placeholder/placeholder.directive";
 
 
 @Component({
@@ -14,6 +16,8 @@ export class AuthComponent {
     isLoginMode: boolean = false;
     isLoading: boolean = false;
     error: string = null;
+    closeSub: Subscription;
+    @ViewChild(PlaceholderDirective, {static:false}) hostPlaceholder: PlaceholderDirective;
 
     constructor(private authService: AuthService, private router: Router){}
 
@@ -42,9 +46,9 @@ export class AuthComponent {
             this.isLoading = false;
             this.router.navigate(['/recipes']);
         }, errorMessage => {
-            console.log(errorMessage);
+            // this.error = errorMessage;
+            this.showError(errorMessage);
             this.isLoading = false;
-            this.error = errorMessage;
         });
         
         form.reset();
@@ -52,5 +56,17 @@ export class AuthComponent {
 
     onHandleError() {
         this.error = null;
+    }
+
+    private showError(message: string){
+        const hostViewContainerRef = this.hostPlaceholder.viewContainerRef;
+        hostViewContainerRef.clear();
+
+        const componentRef = hostViewContainerRef.createComponent(AlertComponent);
+        componentRef.instance.message = message;
+        this.closeSub = componentRef.instance.close.subscribe(()=> {
+            this.closeSub.unsubscribe();
+            hostViewContainerRef.clear();
+        });
     }
 }
