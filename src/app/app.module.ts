@@ -23,7 +23,6 @@ import { AuthModule } from './auth/auth.module';
     HttpClientModule,
     AppRoutingModule,
     AuthModule,
-    RecipesModule,
     ShoppingListModule,
     SharedModule,
     CoreModule
